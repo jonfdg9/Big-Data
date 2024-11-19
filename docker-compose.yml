@@ -1,0 +1,78 @@
+services:
+
+  mongo11:
+    image: mongo
+    container_name: mongo11
+    command: mongod --port 27017 --replSet iabdrs4 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_mongo11_a_db:/data/db
+      - mongodb_mongo11_a_config:/data/configdb
+    ports:
+      - 27117:27017
+    restart: always
+    networks:
+      - mongo-network
+    links:
+      - mongo22
+      - mongo33
+      - mongo44
+
+  mongo22:
+    image: mongo
+    container_name: mongo22
+    command: mongod --port 27017 --replSet iabdrs4 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_mongo22_a_db:/data/db
+      - mongodb_mongo22_a_config:/data/configdb
+    ports:
+      - 27118:27017
+    restart: always
+    networks:
+      - mongo-network
+
+  mongo33:
+    image: mongo
+    container_name: mongo33
+    command: mongod --port 27017 --replSet iabdrs4 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_mongo33_a_db:/data/db
+      - mongodb_mongo33_a_config:/data/configdb
+    ports:
+      - 27119:27017
+    restart: always
+    networks:
+      - mongo-network
+  
+  mongo44:
+    image: mongo
+    container_name: mongo44
+    command: mongod --port 27017 --replSet iabdrs4 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_mongo44_a_db:/data/db
+      - mongodb_mongo44_a_config:/data/configdb
+    ports:
+      - 27120:27017
+    restart: always
+    networks:
+      - mongo-network
+
+volumes:
+  mongodb_mongo11_a_db:
+  mongodb_mongo11_a_config:
+
+  mongodb_mongo22_a_db:
+  mongodb_mongo22_a_config:
+
+  mongodb_mongo33_a_db:
+  mongodb_mongo33_a_config:
+
+  mongodb_mongo44_a_db:
+  mongodb_mongo44_a_config:
+
+networks:
+  mongo-network:
+    driver: bridge
