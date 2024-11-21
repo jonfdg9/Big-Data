@@ -1,0 +1,101 @@
+services:
+
+  ## Router
+  router1:
+    image: mongo
+    container_name: router1
+    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017 --bind_ip_all
+    ports:
+      - 27117:27017
+    restart: always
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_router1_db:/data/db
+      - mongodb_cluster_router1_config:/data/configdb
+    networks:
+      - mongo-network-sharded
+
+  ## Config Servers
+  configsvr1:
+    image: mongo
+    container_name: configsvr1
+    command: mongod --port 27017 --configsvr --replSet rs-config-server --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_configsvr1_db:/data/db
+      - mongodb_cluster_configsvr1_config:/data/configdb
+    ports:
+      - 27118:27017
+    restart: always
+    links:
+      - shard1
+      - shard2
+      - shard3
+    networks:
+      - mongo-network-sharded
+
+  ## Shards
+  ## Shard 1
+  shard1:
+    image: mongo
+    container_name: shard1
+    command: mongod --port 27017 --shardsvr --replSet rshard1 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_shard1_db:/data/db
+      - mongodb_cluster_shard1_config:/data/configdb
+    ports:
+      - 27119:27017
+    restart: always
+    networks:
+      - mongo-network-sharded
+
+  ## Shard 2
+  shard2:
+    image: mongo
+    container_name: shard2
+    command: mongod --port 27017 --shardsvr --replSet rshard2 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_shard2_db:/data/db
+      - mongodb_cluster_shard2_config:/data/configdb
+    ports:
+      - 27120:27017
+    restart: always
+    networks:
+      - mongo-network-sharded
+
+  ## Shard 3
+  shard3:
+    image: mongo
+    container_name: shard3
+    command: mongod --port 27017 --shardsvr --replSet rshard3 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_shard3_db:/data/db
+      - mongodb_cluster_shard3_config:/data/configdb
+    ports:
+      - 27121:27017
+    restart: always
+    networks:
+      - mongo-network-sharded
+
+volumes:
+  mongodb_cluster_router1_db:
+  mongodb_cluster_router1_config:
+
+  mongodb_cluster_configsvr1_db:
+  mongodb_cluster_configsvr1_config:
+
+  mongodb_cluster_shard1_db:
+  mongodb_cluster_shard1_config:
+
+  mongodb_cluster_shard2_db:
+  mongodb_cluster_shard2_config:
+
+  mongodb_cluster_shard3_db:
+  mongodb_cluster_shard3_config:
+
+networks:
+  mongo-network-sharded:
+    driver: bridge
